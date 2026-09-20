@@ -1,0 +1,41 @@
+@startuml
+
+left to right direction
+
+actor User as U
+
+package "Handle Debts" {
+    usecase "Register Debt" as UC1
+    usecase "List Debts" as UC2
+    usecase "Search Debt" as UC3
+    usecase "Update Debt" as UC4
+    usecase "Filter by Direction" as UC5
+    usecase "Filter by Max Term" as UC6
+    usecase "Filter by Settled" as UC7
+    usecase "Filter by Settled Date" as UC9
+    usecase "Validate Debt Do Exist" as UC8
+    usecase "Set Max Term Date" as UC10
+    usecase "Settle Debt" as UC11
+    usecase "Update Settled Date" as UC12
+    usecase "Validate Payments Total" as UC13
+}
+
+U -- UC1
+U -- UC2
+U -- UC3
+U -- UC4
+U -- UC11
+
+
+UC3 ..> UC8 : <<include>>
+UC4 ..> UC8 : <<include>>
+UC11 ..> UC12 : <<include>>
+UC11 ..> UC13 : <<include>>
+
+UC2 <.. UC5 : <<extends>>
+UC2 <.. UC6 : <<extends>>
+UC2 <.. UC7 : <<extends>>
+UC2 <.. UC9 : <<extends>>
+UC4 <.. UC10 : <<extends>>
+
+@enduml

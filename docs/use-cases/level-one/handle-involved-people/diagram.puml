@@ -1,0 +1,27 @@
+@startuml
+
+left to right direction
+
+actor User as U
+
+package "Handle Involved People" {
+    usecase "Register Person" as UC1
+    usecase "List People" as UC2
+    usecase "Search Person" as UC3
+    usecase "Update person" as UC4
+    usecase "Delete Person" as UC5
+    usecase "Delete All People" as UC6
+    usecase "Validate Person Do Exists" as UC7
+}
+
+U -- UC1
+U -- UC2
+U -- UC3
+U -- UC4
+U -- UC5
+U -- UC6
+
+UC4 ..> UC7 : <<include>>
+UC5 ..> UC7 : <<include>>
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+
+left to right direction
+
+actor User as U
+
+rectangle FinTrack {
+    usecase "Handle Involved People" as UC1
+    usecase "Handle Transactions" as UC2
+    usecase "Handle Debts" as UC3
+    usecase "Handle Payments" as UC4
+}
+
+U -- UC1
+U -- UC2
+U -- UC3
+U -- UC4
+
+@enduml
