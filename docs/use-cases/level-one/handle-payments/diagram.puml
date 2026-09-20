@@ -1,0 +1,31 @@
+@startuml
+
+left to right direction
+
+actor User as U
+
+package "Handle Payments" {
+    usecase "Register Payment" as UC1
+    usecase "List Payments" as UC2
+    usecase "Search Payment" as UC3
+    usecase "Update Payment" as UC4
+    usecase "Filter By Debt" as UC5
+    usecase "Validate Payment Do Exist" as UC6
+    usecase "Filter By Date" as UC7
+    usecase "Filter By Amount" as UC8
+    
+}
+
+U -- UC1
+U -- UC2
+U -- UC3
+U -- UC4
+
+UC3 ..> UC6 : <<include>>
+UC4 ..> UC6 : <<include>>
+
+UC2 <.. UC5 : <<extends>>
+UC2 <.. UC7 : <<extends>>
+UC2 <.. UC8 : <<extends>>
+
+@enduml
