@@ -1,0 +1,8 @@
+[project]
+name = "FinTrack"
+version = "1.0.0"
+description = "Financial tracking app built with Flet & Sqlite"
+
+[tool.flet]
+org = "com.ivans"
+product = "FinTrack"
