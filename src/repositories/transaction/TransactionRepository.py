@@ -3,6 +3,7 @@ from repositories.utils.querys import (
     INSERT_TRANSACTION,
     SELECT_ALL_TRANSACTIONS,
     SELECT_TRANSACTION_BY_TYPE,
+    SELECT_ONE_TRANSACTION
 )
 from models.transaction.Transaction import Transaction
 from repositories.utils.DB import DB
@@ -29,3 +30,7 @@ class TransactionRepository:
             return conn.execute(
                 SELECT_TRANSACTION_BY_TYPE, (transaction_type,)
             ).fetchall()
+
+    def get(self, transaction_id: int) -> sql.Row:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_ONE_TRANSACTION, (transaction_id,)).fetchone()

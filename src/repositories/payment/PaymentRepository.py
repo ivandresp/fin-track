@@ -1,7 +1,7 @@
 import sqlite3 as sql
-from models.payment.Payment import Payment
+from models.payment.Payment import Payment, PaymentMethod
 from repositories.utils.DB import DB
-from repositories.utils.querys import INSERT_PAYMENT, SELECT_PAYMENTS_BY_DEBT, SELECT_PAYMENTS_BY_METHOD, SELECT_ALL_PAYMENTS
+from repositories.utils.querys import INSERT_PAYMENT, SELECT_PAYMENTS_BY_DEBT, SELECT_PAYMENTS_BY_METHOD, SELECT_ALL_PAYMENTS, SELECT_ONE_PAYMENT
 
 class PaymentRepository:
     def __init__(self, db:DB):
@@ -13,6 +13,20 @@ class PaymentRepository:
         conn.close()
         return cursor.lastrowid
 
-    
+    def get_by_debt(self, debt_id: int) -> list[sql.Row]:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_PAYMENTS_BY_DEBT, (debt_id,)).fetchall()
 
-        
+    def get_all_by_method(self, method: PaymentMethod) -> list[sql.Row]:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_PAYMENTS_BY_METHOD, (method.value,)).fetchall()
+
+    def get_all(self) -> list[sql.Row]:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_ALL_PAYMENTS).fetchall()
+
+    def get(self, payment_id:int) -> sql.Row:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_ONE_PAYMENT, (payment_id,)).fetchone()
+
+    

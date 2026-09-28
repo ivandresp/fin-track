@@ -5,7 +5,8 @@ from repositories.utils.querys import (
     SELECT_DEBTS_BY_PERSON,
     SELECT_DEBTS_BY_SETTLEMENT_STATUS,
     SELECT_DEBT_TOTAL,
-    SETTLE_DEBT
+    SETTLE_DEBT,
+    SELECT_ONE_DEBT
 )
 from models.debt.Debt import Debt
 from models.payment.Payment import Payment
@@ -47,6 +48,10 @@ class DebtRepository:
 
     def get_debt_total(self, debt_id: int, conn: sql.Connection) -> sql.Row:
         return conn.execute(SELECT_DEBT_TOTAL, (debt_id,)).fetchone()
+
+    def get(self, debt_id: int) -> sql.Row:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_ONE_DEBT, (debt_id,)).fetchone()
 
     def register_payment_and_validate(self, payment:Payment) -> bool:
         conn = self.db.connect()
