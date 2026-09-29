@@ -54,7 +54,8 @@ class DebtService:
         if method not in PAYMENT_METHODS:
             raise ValueError("Metodo de pago invalido")
 
-        payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), date=date if date is not None else None)
+        payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), 
+                    date=date or Date.today().isoformat())
         
         return self.repo.register_payment_and_validate(payment)
 
