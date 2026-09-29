@@ -6,7 +6,7 @@ from repositories.utils.querys import (
     SELECT_DEBTS_BY_SETTLEMENT_STATUS,
     SELECT_DEBT_TOTAL,
     SETTLE_DEBT,
-    SELECT_ONE_DEBT
+    SELECT_ONE_DEBT,
 )
 from models.debt.Debt import Debt
 from models.payment.Payment import Payment
@@ -46,20 +46,24 @@ class DebtRepository:
                 SELECT_DEBTS_BY_SETTLEMENT_STATUS, (int(settled),)
             ).fetchall()
 
-    def get_debt_total(self, debt_id: int, conn: sql.Connection) -> sql.Row:
+    def get_debt_total(self, debt_id: int, conn: sql.Connection | None) -> sql.Row:
+        if conn is None:
+            with self.db.connect() as conn:
+                return conn.execute(SELECT_DEBT_TOTAL, (debt_id,)).fetchone()
+
         return conn.execute(SELECT_DEBT_TOTAL, (debt_id,)).fetchone()
 
     def get(self, debt_id: int) -> sql.Row:
         with self.db.connect() as conn:
             return conn.execute(SELECT_ONE_DEBT, (debt_id,)).fetchone()
 
-    def register_payment_and_validate(self, payment:Payment) -> bool:
+    def register_payment_and_validate(self, payment: Payment) -> tuple[int, bool]:
         conn = self.db.connect()
         try:
             conn.execute("BEGIN INMEDIATE")
 
-            self.payment_repository.save(payment, conn=conn)
-            
+            p_id = self.payment_repository.save(payment, conn=conn)
+
             row = self.get_debt_total(payment.debt_id, conn)
 
             if row is None:
@@ -70,7 +74,7 @@ class DebtRepository:
                 conn.execute(SETTLE_DEBT, (payment.debt_id,))
 
             conn.commit()
-            return settled
+            return (p_id, settled)
         except Exception:
             conn.rollback()
             raise
