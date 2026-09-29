@@ -115,7 +115,7 @@ def payments_view(page: ft.Page, payment_controller: PaymentController,
     def _on_filter_change(e):
         _refresh_list()
  
-    filter_dropdown.on_change = _on_filter_change
+    filter_dropdown.on_text_change = _on_filter_change
  
     _on_load_unsettled_debts()
     _refresh_list()

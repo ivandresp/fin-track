@@ -122,7 +122,7 @@ def debts_view(page: ft.Page, controller:DebtController, person_controller:Perso
     def _on_filter_change(e):
         _refresh()
 
-    dropdown_filter.on_change = _on_filter_change
+    dropdown_filter.on_text_change = _on_filter_change
     _refresh()
 
     return ft.View(
