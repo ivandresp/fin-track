@@ -4,12 +4,12 @@ from datetime import datetime, date as Date
 
 @dataclass
 class Payment:
-    id: int | None
     debt_id: int
     amount: int
     method: PaymentMethod
-    date: Date
-    created_at: datetime
+    date: Date | None = None
+    id: int | None = None
+    created_at: datetime | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -21,13 +21,13 @@ class Payment:
             "created_at": self.created_at.isoformat(),
         }
 
-    @staticmethod
-    def from_row(row: tuple) -> "Payment":
-        return Payment(
-            id=row[0],
-            debt_id=row[1],
-            amount=row[2],
-            method=PaymentMethod(row[3]),
-            date=Date.fromisoformat(row[4]),
-            created_at=datetime.fromisoformat(row[5]),
+    @classmethod
+    def from_row(cls, row) -> "Payment":
+        return cls(
+            id=row["id"],
+            debt_id=row["debt_id"],
+            amount=row["amount"],
+            method=PaymentMethod(row["method"]),
+            date=row["date"],
+            created_at=row["created_at"],
         )

@@ -4,13 +4,13 @@ from models.debt.DebtDirection import DebtDirection
 
 @dataclass
 class Debt:
-    id: int | None
     transaction_id: int
     involved_person_id: int
     direction: DebtDirection
     max_repayment_date: Date | None
-    settled: bool
-    settled_at: datetime | None
+    id: int | None = None
+    settled: bool = False
+    settled_at: datetime | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -23,14 +23,14 @@ class Debt:
             "settled_at": self.settled_at.isoformat() if self.settled_at else None,
         }
 
-    @staticmethod
-    def from_row(row: tuple) -> "Debt":
-        return Debt(
-            id=row[0],
-            transaction_id=row[1],
-            involved_person_id=row[2],
-            direction=DebtDirection(row[3]),
-            max_repayment_date=Date.fromisoformat(row[4]) if row[4] else None,
-            settled=row[5],
-            settled_at=datetime.fromisoformat(row[6]) if row[6] else None,
+    @classmethod
+    def from_row(cls, row) -> "Debt":
+        return cls(
+            id=row["id"],
+            transaction_id=row["transaction_id"],
+            involved_person_id=row["involved_person_id"],
+            direction=DebtDirection(row["direction"]),
+            max_repayment_date=row["max_repayment_date"],
+            settled=bool(row["settled"]),
+            settled_at=row["settled_at"],
         )

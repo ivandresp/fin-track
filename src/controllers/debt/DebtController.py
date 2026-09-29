@@ -41,11 +41,12 @@ class DebtController:
         transaction_id: int,
         involved_person_id: int,
         direction: str,
-        max_repayment_date: str | None,
+        max_repayment_date: str | None = None,
     ):
         try:
             return self.service.save(
-                transaction_id, involved_person_id, direction, max_repayment_date
+                transaction_id, involved_person_id, direction, 
+                max_repayment_date=max_repayment_date if max_repayment_date is not None else None 
             )
         except (ValueError, TypeError) as e:
             msg = str(e) if isinstance(e, ValueError) else "La fecha es invalida"

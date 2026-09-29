@@ -62,7 +62,7 @@ class DebtRepository:
     def register_payment_and_validate(self, payment: Payment) -> tuple[int, bool]:
         conn = self.db.connect()
         try:
-            conn.execute("BEGIN INMEDIATE")
+            conn.execute("BEGIN IMMEDIATE")
 
             p_id = self.payment_repository.save(payment, conn=conn)
 

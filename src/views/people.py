@@ -51,7 +51,7 @@ def people_view(page: ft.Page, controller: PersonController, user_name: str) -> 
     return ft.View(
         route="/people",
         controls=[
-            appbar_app("Personas", user_name),
+            appbar_app(page, "Personas", user_name),
             ft.Container(
                 expand=True,
                 padding=20,

@@ -16,7 +16,7 @@ class DebtService:
         transaction_id: int,
         involved_person_id: int,
         direction: str,
-        max_repayment_date: str | None,
+        max_repayment_date: str | None = None,
     ) -> int:
         if direction not in DIRECTIONS:
             raise ValueError("Direccion invalida. Solo propia o ajena.")
@@ -25,7 +25,7 @@ class DebtService:
             transaction_id=transaction_id,
             involved_person_id=involved_person_id,
             direction=DebtDirection(direction),
-            max_repayment_date=Date.fromisoformat(max_repayment_date),
+            max_repayment_date=Date.fromisoformat(max_repayment_date) if max_repayment_date is not None else None,
         )
 
         return self.repo.save(debt)
@@ -54,7 +54,7 @@ class DebtService:
         if method not in PAYMENT_METHODS:
             raise ValueError("Metodo de pago invalido")
 
-        payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), date=date)
+        payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), date=date if date is not None else None)
         
         return self.repo.register_payment_and_validate(payment)
 

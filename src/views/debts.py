@@ -104,7 +104,7 @@ def debts_view(page: ft.Page, controller:DebtController, person_controller:Perso
             return
         dropdown_people.error_text = None
  
-        debt_id = controller.crear_deuda_completa(
+        debt_id = controller.on_save_complete(
             txt_amount.value,
             txt_desc.value,
             int(dropdown_people.value),
@@ -128,7 +128,7 @@ def debts_view(page: ft.Page, controller:DebtController, person_controller:Perso
     return ft.View(
         route="/debts",
         controls=[
-            appbar_app("Deudas", user_name),
+            appbar_app(page, "Deudas", user_name),
             ft.Container(
                 expand=True,
                 padding=20,

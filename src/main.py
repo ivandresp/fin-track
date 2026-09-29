@@ -50,7 +50,7 @@ async def main(page: ft.Page):
         return ft.View(
             route="/",
             controls=[
-                appbar_app("Inicio", status["user_name"]),
+                appbar_app(page, "Inicio", status["user_name"], show_back=False),
                 ft.Container(
                     padding=20,
                     content=ft.Column(
@@ -68,12 +68,12 @@ async def main(page: ft.Page):
                             ft.FilledButton(
                                 "Deudas",
                                 icon=ft.Icons.MONEY_OFF,
-                                on_click=lambda e: page.go("/debts"),
+                                on_click=lambda e: page.navigate("/debts"),
                             ),
                             ft.FilledButton(
                                 "Pagos",
                                 icon=ft.Icons.PAYMENTS,
-                                on_click=lambda e: page.go("/payments"),
+                                on_click=lambda e: page.navigate("/payments"),
                             ),
                         ],
                         spacing=10,

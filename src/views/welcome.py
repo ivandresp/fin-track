@@ -39,13 +39,20 @@ def welcome_view(page:ft.Page, on_continue) -> ft.View:
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
     )
 
-def appbar_app(title:str, user_name:str) -> ft.AppBar:
+def appbar_app(page: ft.Page, title:str, user_name:str, show_back:bool = True) -> ft.AppBar:
     return ft.AppBar(
+        leading=(
+            ft.IconButton(
+                icon=ft.Icons.ARROW_BACK,
+                tooltip="Volver al inicio",
+                on_click=lambda e: page.navigate("/")
+            ) if show_back else None
+        ),
         title=ft.Text(title),
         center_title=False,
         actions=[
             ft.Row(
-                [ft.Icon(ft.Icons.ACCOUNT_CIRCLE), ft.Text(user_name)],
+                [ft.Text(user_name), ft.Icon(ft.Icons.ACCOUNT_CIRCLE)],
                 spacing=5,
             ),
             ft.Container(width=15),

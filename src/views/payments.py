@@ -123,7 +123,7 @@ def payments_view(page: ft.Page, payment_controller: PaymentController,
     return ft.View(
         route="/payments",
         controls=[
-            appbar_app("Pagos", user_name),
+            appbar_app(page,"Pagos", user_name),
             ft.Container(
                 expand=True,
                 padding=20,

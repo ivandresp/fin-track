@@ -69,7 +69,7 @@ def transactions_view(page:ft.Page, controller: TransactionController, user_name
     return ft.View(
         route="/transactions",
         controls=[
-            appbar_app("Transacciones", user_name),
+            appbar_app(page, "Transacciones", user_name),
             ft.Container(
                 expand=True,
                 padding=20,

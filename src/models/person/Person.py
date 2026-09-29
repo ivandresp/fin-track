@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Person:
-    id: int | None
     name: str
     phone: str
+    id: int | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -13,10 +13,10 @@ class Person:
             "phone": self.phone,
         }
 
-    @staticmethod
-    def from_row(row: tuple) -> "Person":
-        return Person(
-            id=row[0],
-            name=row[1],
-            phone=row[2],
+    @classmethod
+    def from_row(cls, row: tuple) -> "Person":
+        return cls(
+            id=row["id"],
+            name=row["name"],
+            phone=row["phone"],
         )
