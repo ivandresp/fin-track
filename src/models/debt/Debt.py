@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date as Date, datetime
-from DebtDirection import DebtDirection
+from models.debt.DebtDirection import DebtDirection
 
 @dataclass
 class Debt:

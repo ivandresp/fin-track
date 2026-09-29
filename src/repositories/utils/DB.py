@@ -19,41 +19,40 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 CREATE TABLE IF NOT EXISTS debts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    transaction_id INTEGER NOT NULL ON DELETE RESTRICT,
+    transaction_id INTEGER NOT NULL,
     involved_person_id INTEGER NOT NULL,
     direction TEXT NOT NULL CHECK (direction IN ('PROPIA', 'AJENA')),
     max_repayment_date TEXT,
     settled INTEGER NOT NULL DEFAULT 0 CHECK (settled IN (0, 1)),
     settled_at TEXT,
-    FOREIGN KEY (transaction_id) REFERENCES transactions(id),
-    FOREIGN KEY (involved_person_id) REFERENCES persons(id)   
+    FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE RESTRICT,
+    FOREIGN KEY (involved_person_id) REFERENCES persons(id)
 );
 
 CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    debt_id INTEGER NOT NULL ON DELETE RESTRICT,
+    debt_id INTEGER NOT NULL,
     amount INTEGER NOT NULL CHECK (amount > 0),
     method TEXT NOT NULL CHECK (method IN ('EFECTIVO', 'TRANSFERENCIA', 'TARJETA')),
     date TEXT NOT NULL DEFAULT (date('now')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (debt_id) REFERENCES debts(id)
+    FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE RESTRICT
 );
 
-CREATE INDEX IF NOT EXISTS idx_deudas_persona ON deudas(persona_id);
-CREATE INDEX IF NOT EXISTS idx_abonos_deuda   ON abonos(deuda_id);
- 
-CREATE TRIGGER IF NOT EXISTS trg_movimientos_no_delete
-BEFORE DELETE ON movimientos
-BEGIN SELECT RAISE(ABORT, 'No se permite eliminar movimientos'); END;
- 
-CREATE TRIGGER IF NOT EXISTS trg_deudas_no_delete
-BEFORE DELETE ON deudas
-BEGIN SELECT RAISE(ABORT, 'No se permite eliminar deudas'); END;
- 
-CREATE TRIGGER IF NOT EXISTS trg_abonos_no_delete
-BEFORE DELETE ON abonos
-BEGIN SELECT RAISE(ABORT, 'No se permite eliminar abonos'); END;
+CREATE INDEX IF NOT EXISTS idx_debts_person ON debts(involved_person_id);
+CREATE INDEX IF NOT EXISTS idx_payments_debt ON payments(debt_id);
 
+CREATE TRIGGER IF NOT EXISTS trg_transactions_no_delete
+BEFORE DELETE ON transactions
+BEGIN SELECT RAISE(ABORT, 'No se permite eliminar transacciones'); END;
+
+CREATE TRIGGER IF NOT EXISTS trg_debts_no_delete
+BEFORE DELETE ON debts
+BEGIN SELECT RAISE(ABORT, 'No se permite eliminar deudas'); END;
+
+CREATE TRIGGER IF NOT EXISTS trg_payments_no_delete
+BEFORE DELETE ON payments
+BEGIN SELECT RAISE(ABORT, 'No se permite eliminar pagos'); END;
 """
 
 

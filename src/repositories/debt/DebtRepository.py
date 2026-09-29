@@ -9,7 +9,8 @@ from repositories.utils.querys import (
     SELECT_ONE_DEBT,
     SELECT_DEBTS_BY_DIRECTION
 )
-from models.debt.Debt import Debt, DebtDirection
+from models.debt.Debt import Debt
+from models.debt.DebtDirection import DebtDirection
 from models.payment.Payment import Payment
 from repositories.utils.DB import DB
 from repositories.payment.PaymentRepository import PaymentRepository

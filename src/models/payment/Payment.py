@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from PaymentMethod import PaymentMethod
+from models.payment.PaymentMethod import PaymentMethod
 from datetime import datetime, date as Date
 
 @dataclass
