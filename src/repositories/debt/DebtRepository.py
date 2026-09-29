@@ -7,8 +7,9 @@ from repositories.utils.querys import (
     SELECT_DEBT_TOTAL,
     SETTLE_DEBT,
     SELECT_ONE_DEBT,
+    SELECT_DEBTS_BY_DIRECTION
 )
-from models.debt.Debt import Debt
+from models.debt.Debt import Debt, DebtDirection
 from models.payment.Payment import Payment
 from repositories.utils.DB import DB
 from repositories.payment.PaymentRepository import PaymentRepository
@@ -80,3 +81,7 @@ class DebtRepository:
             raise
         finally:
             conn.close()
+
+    def get_by_direction(self, direction: DebtDirection):
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_DEBTS_BY_DIRECTION, (direction.value,)).fetchall()

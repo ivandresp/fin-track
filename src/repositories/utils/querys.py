@@ -11,6 +11,7 @@ SELECT_ALL_DEBTS = "SELECT * FROM debts"
 SELECT_DEBTS_BY_PERSON = "SELECT * FROM debts WHERE involved_person_id = ?"
 SELECT_DEBTS_BY_SETTLEMENT_STATUS = "SELECT * FROM debts WHERE settled = ?"
 SELECT_ONE_DEBT = "SELECT * FROM debts WHERE id = ?"
+SELECT_DEBTS_BY_DIRECTION = "SELECT * FROM debts WHERE direction = ?"
 
 SELECT_DEBT_TOTAL = """
     SELECT t.amount AS total_amount, COALESCE(SUM(p.amount), 0) AS total_paid, (t.amount - COALESCE(SUM(p.amount), 0)) AS remaining_amount
