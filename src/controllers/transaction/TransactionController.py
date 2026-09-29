@@ -1,6 +1,6 @@
 import flet as ft
 from services.transaction.TransactionService import TransactionService
-from utils.convert import decimal_from_str
+from controllers.utils.convert import decimal_from_str
 
 
 class TransactionController:
@@ -18,7 +18,7 @@ class TransactionController:
             self._show_msg(str(e), is_error=True)
             return None
 
-    def on_find(self, transaction_id:int):
+    def on_find(self, transaction_id: int):
         try:
             return self.service.find(transaction_id)
         except Exception:
@@ -32,7 +32,7 @@ class TransactionController:
             self._show_msg("No se pudieron cargar las transacciones")
             return []
 
-    def on_find_by_type(self, type:str):
+    def on_find_by_type(self, type: str):
         try:
             return self.service.find_by_type(type)
         except ValueError as e:
@@ -43,8 +43,8 @@ class TransactionController:
             return []
 
     def _show_msg(self, text: str, is_error: bool = False):
-        self.page.snack_bar = ft.SnackBar(
-            content=ft.Text(text), bgcolor=ft.Colors.RED if is_error else None
+        self.page.show_dialog(
+            ft.SnackBar(
+                content=ft.Text(text), bgcolor=ft.Colors.RED if is_error else None
+            )
         )
-        self.page.snack_bar.open = True
-        self.page.update()

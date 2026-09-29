@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, date as Date
-from TransactionType import TransactionType
+from models.transaction.TransactionType import TransactionType
 
 @dataclass
 class Transaction:

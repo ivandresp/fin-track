@@ -1,4 +1,4 @@
-from utils.func import Decimal, to_decimal
+from services.utils.func import Decimal, to_decimal
 from dataclasses import dataclass
 
 @dataclass

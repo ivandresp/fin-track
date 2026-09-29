@@ -1,6 +1,6 @@
 import flet as ft
 
-from controller.transaction.TransactionController import TransactionController
+from controllers.transaction.TransactionController import TransactionController
 from services.utils.func import to_decimal
 from models.transaction.Transaction import Transaction
 from views.welcome import appbar_app

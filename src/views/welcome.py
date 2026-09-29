@@ -3,10 +3,10 @@ import flet as ft
 USER_NAME_KEY = "user_name"
 
 async def get_user_name(page:ft.Page) -> str | None:
-    return await page.client_storage.get_async(USER_NAME_KEY)
+    return await ft.SharedPreferences().get(USER_NAME_KEY)
 
 async def save_user_name(page:ft.Page, name:str):
-    await page.client_storage.set_async(USER_NAME_KEY, name)
+    await ft.SharedPreferences().set(USER_NAME_KEY, name)
 
 def welcome_view(page:ft.Page, on_continue) -> ft.View:
     txt_name = ft.TextField(label="¿Cómo te llamas?", autofocus=True, width=300)

@@ -1,8 +1,8 @@
 from repositories.debt.DebtRepository import DebtRepository
 from models.debt.Debt import Debt, DebtDirection, Date
 from models.payment.Payment import Payment, PaymentMethod
-from utils.Balance import Balance, Decimal
-from utils.func import to_cents
+from services.utils.Balance import Balance, Decimal
+from services.utils.func import to_cents
 
 DIRECTIONS = ("PROPIA", "AJENA")
 PAYMENT_METHODS = ("EFECTIVO", "TRANSFERENCIA", "TARJETA")

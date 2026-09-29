@@ -30,7 +30,7 @@ async def main(page: ft.Page):
 
     person_repo = PersonRepository(db)
     person_service = PersonService(person_repo)
-    person_controller = PersonController(person_service)
+    person_controller = PersonController(person_service, page)
 
     transaction_repo = TransactionRepository(db)
     transaction_service = TransactionService(transaction_repo)
@@ -44,13 +44,13 @@ async def main(page: ft.Page):
     debt_service = DebtService(debt_repo)
     debt_controller = DebtController(debt_service, transaction_service, page)
 
-    user_name = await get_user_name(page)
+    status = {"user_name": await get_user_name(page)}
 
     def main_view() -> ft.View:
         return ft.View(
             route="/",
             controls=[
-                appbar_app("Inicio", user_name),
+                appbar_app("Inicio", status["user_name"]),
                 ft.Container(
                     padding=20,
                     content=ft.Column(
@@ -82,20 +82,27 @@ async def main(page: ft.Page):
             ],
         )
 
-    def route_change(e: ft.RouteChangeEvent):
+    async def on_continue(name:str):
+        status["user_name"] = name
+        route_change()
+
+    def route_change(e: ft.RouteChangeEvent = None):
         page.views.clear()
 
-        if page.route == "/people":
-            page.views.append(people_view(page, person_controller, user_name))
+        if not status["user_name"]:
+            page.views.append(welcome_view(page, on_continue))
+
+        elif page.route == "/people":
+            page.views.append(people_view(page, person_controller, status["user_name"]))
         
         elif page.route == "/transactions":
-            page.views.append(transactions_view(page, transaction_controller, user_name))
+            page.views.append(transactions_view(page, transaction_controller, status["user_name"]))
         
         elif page.route == "/debts":
-            page.views.append(debts_view(page, debt_controller, person_controller, user_name))
+            page.views.append(debts_view(page, debt_controller, person_controller, status["user_name"]))
         
         elif page.route == "/payments":
-            page.views.append(payments_view(page,payment_controller,debt_controller,person_controller,user_name,))
+            page.views.append(payments_view(page,payment_controller,debt_controller,person_controller,status["user_name"],))
         
         else:
             page.views.append(main_view())
@@ -103,17 +110,6 @@ async def main(page: ft.Page):
         page.update()
 
     page.on_route_change = route_change
-
-    async def on_continue(name: str):
-        nonlocal user_name
-        user_name = name
-        page.navigate("/")
-
-    if user_name:
-        page.navigate("/")
-    else:
-        page.views.append(welcome_view(page, on_continue))
-        page.update()
-
+    route_change()
 
 ft.run(main)
