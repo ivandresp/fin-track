@@ -1,11 +1,25 @@
 import flet as ft
 from services.debt.DebtService import DebtService
+from services.transaction.TransactionService import TransactionService
 from utils.convert import decimal_from_str
 
 class DebtController:
-    def __init__(self, service: DebtService, page:ft.Page):
+    def __init__(self, service: DebtService, transaction_service:TransactionService, page:ft.Page):
         self.service = service
+        self.transaction_service = transaction_service
         self.page = page
+
+    def on_save_complete(self, amount_txt:str, descripcion:str, involved_person_id:int, direction:str, max_repayment_date:str | None):
+        try:
+            amount = decimal_from_str(amount_txt)
+            transaction_id = self.transaction_service.save("DEUDA", amount, descripcion)
+            debt_id = self.service.save(transaction_id, involved_person_id, direction, max_repayment_date)
+            self._show_msg("Deuda registrada correctamente")
+            return debt_id
+        except (ValueError, TypeError) as e:
+            msg = str(e) if isinstance(e, ValueError) else "La fecha es inválida."
+            self._show_msg(msg, is_error=True)
+            return None
 
     def on_save(self, transaction_id:int, involved_person_id:int, direction:str, max_repayment_date:str | None):
         try:
