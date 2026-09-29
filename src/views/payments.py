@@ -64,7 +64,7 @@ def payments_view(page: ft.Page, payment_controller: PaymentController,
         page.update()
  
     def _row_payment(payment:Payment) -> ft.Card:
-        debt = debt_controller.buscar(payment.debt_id)
+        debt = debt_controller.on_find(payment.debt_id)
         person_name = (people_by_id.get(debt.involved_person_id, "Desconocido") if debt else "Deuda no encontrada")
         amount = to_decimal(payment.amount)
  
