@@ -57,3 +57,9 @@ class DebtService:
         payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), date=date)
         
         return self.repo.register_payment_and_validate(payment)
+
+    def find_by_direction(self, direction:str):
+        if direction not in DIRECTIONS:
+            raise ValueError("Solo se pueden ver deudas propias o ajenas.")
+
+        return [Debt.from_row(d) for d in self.repo.get_by_direction(DebtDirection(direction))]
