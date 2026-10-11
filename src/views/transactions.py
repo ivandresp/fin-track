@@ -9,6 +9,8 @@ from views.ui import (
     SUCCESS,
     WARNING,
     PillSelector,
+    amount_field,
+    clean_amount,
     dropdown,
     empty_state,
     grid,
@@ -53,12 +55,7 @@ def transactions_view(
         value=CREABLE_TYPES[0],
         col={"xs": 12, "sm": 6, "md": 3},
     )
-    txt_amount = text_field(
-        "Monto",
-        keyboard_type=ft.KeyboardType.NUMBER,
-        prefix="$ ",
-        col={"xs": 12, "sm": 6, "md": 3},
-    )
+    txt_amount = amount_field(col={"xs": 12, "sm": 6, "md": 3})
     txt_desc = text_field("Descripción", col={"xs": 12, "md": 6})
 
     hero_slot = ft.Container()
@@ -122,7 +119,7 @@ def transactions_view(
 
     def _on_add(e):
         trans_id = controller.on_save(
-            dropdown_type.value, txt_amount.value, txt_desc.value
+            dropdown_type.value, clean_amount(txt_amount.value), txt_desc.value
         )
         if trans_id is not None:
             txt_amount.value = ""

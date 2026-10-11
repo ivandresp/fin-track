@@ -6,13 +6,14 @@ import flet as ft
 from controllers.debt.DebtController import DebtController
 from controllers.person.PersonController import PersonController
 from models.debt.Debt import Debt
-from services.utils.func import to_decimal
 from views.ui import (
     DANGER,
     SUCCESS,
     TEXT_MUTED,
     WARNING,
     PillSelector,
+    amount_field,
+    clean_amount,
     badge,
     dropdown,
     empty_state,
@@ -75,12 +76,7 @@ def debts_view(
         value="PROPIA",
         col={"xs": 12, "sm": 6, "md": 4},
     )
-    txt_amount = text_field(
-        "Monto",
-        keyboard_type=ft.KeyboardType.NUMBER,
-        prefix="$ ",
-        col={"xs": 12, "sm": 6, "md": 4},
-    )
+    txt_amount = amount_field(col={"xs": 12, "sm": 6, "md": 4})
     txt_desc = text_field("Descripción", col={"xs": 12, "sm": 6, "md": 6})
     txt_max_date = text_field(
         "Plazo máximo (opcional)",
@@ -117,8 +113,7 @@ def debts_view(
                 [
                     progress_bar(paid_cents / total_cents, color),
                     ft.Text(
-                        f"Pagado {money(paid_cents)} de "
-                        f"{money(total_cents)}",
+                        f"Pagado {money(paid_cents)} de " f"{money(total_cents)}",
                         size=11,
                         color=TEXT_MUTED,
                     ),
@@ -177,7 +172,9 @@ def debts_view(
             list_area.controls = [
                 grid(
                     [
-                        _row_debt(d, balances.get(d.id) or controller.on_get_balance(d.id))
+                        _row_debt(
+                            d, balances.get(d.id) or controller.on_get_balance(d.id)
+                        )
                         for d in debts
                     ]
                 )
@@ -205,7 +202,7 @@ def debts_view(
         dropdown_people.error = None
 
         debt_id = controller.on_save_complete(
-            txt_amount.value,
+            clean_amount(txt_amount.value),
             txt_desc.value,
             int(dropdown_people.value),
             dropdown_direction.value,
@@ -230,9 +227,7 @@ def debts_view(
                     spacing=12,
                     run_spacing=12,
                 ),
-                ft.ResponsiveRow(
-                    [txt_desc, txt_max_date], spacing=12, run_spacing=12
-                ),
+                ft.ResponsiveRow([txt_desc, txt_max_date], spacing=12, run_spacing=12),
                 ft.ResponsiveRow(
                     [primary_button("Guardar deuda", _on_add, ft.Icons.ADD)]
                 ),
