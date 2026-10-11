@@ -3,16 +3,18 @@ name = "FinTrack"
 version = "1.0.0"
 description = "Financial tracking app built with Flet & Sqlite"
 authors = [
-    { name = "Ivan Saumeth.", email = nestorsaumeth20@gmail.com }
+    { name = "Ivan Saumeth.", email = "nestorsaumeth20@gmail.com" }
 ]
 
 [tool.flet]
 org = "com.ivanstudio"
 product = "FinTrack"
-android.adaptative_icon_background = "#ffffff"
+
+[tool.flet.android]
+adaptive_icon_background = "#ffffff"
 
 [tool.flet.icons]
-android = "assets/icon.jpeg"
+android = "assets/icon.png"
 
 [tool.flet.app]
 path = "src"
