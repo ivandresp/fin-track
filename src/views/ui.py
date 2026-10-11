@@ -61,6 +61,42 @@ def money(value) -> str:
     return f"{sign}${abs(value):,.2f}"
 
 
+def format_amount_text(raw: str | None) -> str:
+    """Formato visual mientras se escribe: '1234567.5' -> '1,234,567.5'.
+
+    - Coma como separador de miles y punto como decimal (igual que money()).
+    - Máximo 2 decimales (los centavos que realmente se guardan).
+    - Si el usuario escribe una coma al final ('1,234,'), se toma como su
+      intención de poner decimales y se convierte en punto: las comas que
+      inserta este formato siempre quedan entre dígitos, nunca al final.
+    """
+    s = (raw or "").replace(" ", "")
+    if s.endswith(",") and "." not in s:
+        s = s[:-1] + "."
+    s = s.replace(",", "")
+
+    int_part, dot, dec_part = s.partition(".")
+    int_part = "".join(ch for ch in int_part if ch.isdigit())
+    dec_part = "".join(ch for ch in dec_part if ch.isdigit())[:2]
+
+    if int_part:
+        int_part = int_part.lstrip("0") or "0"
+    elif dot:
+        int_part = "0"
+
+    grouped = f"{int(int_part):,}" if int_part else ""
+    return grouped + (dot + dec_part if dot else "")
+
+
+def clean_amount(text: str | None) -> str:
+    """Valor sin separadores ('1,234,567.50' -> '1234567.50').
+
+    Es lo que debe recibir el controlador: así el comportamiento del backend
+    queda exactamente igual que antes de formatear el campo.
+    """
+    return (text or "").replace(",", "").strip()
+
+
 def apply_theme(page: ft.Page) -> None:
     """Llamar una vez al inicio de main(page)."""
     page.theme_mode = ft.ThemeMode.DARK
@@ -186,6 +222,28 @@ def text_field(label: str, **kwargs) -> ft.TextField:
             ),
         },
         text_size=14,
+        **kwargs,
+    )
+
+
+def _format_on_change(e) -> None:
+    formatted = format_amount_text(e.control.value)
+    if formatted != e.control.value:
+        e.control.value = formatted
+        e.control.update()
+
+
+def amount_field(label: str = "Monto", **kwargs) -> ft.TextField:
+    """Campo de dinero: se formatea con separadores de miles mientras se escribe.
+
+    Es solo visual. Antes de enviar el valor al controlador, pásalo por
+    clean_amount(campo.value).
+    """
+    return text_field(
+        label,
+        keyboard_type=ft.KeyboardType.NUMBER,
+        prefix="$ ",
+        on_change=_format_on_change,
         **kwargs,
     )
 
