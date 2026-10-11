@@ -107,7 +107,7 @@ def debts_view(
         else:
             status = badge("Pendiente", WARNING)
 
-        remaining = to_decimal(balance.remaining_amount) if balance else None
+        remaining = balance.remaining_amount if balance else None
 
         footer = None
         total_cents = getattr(balance, "total_amount", None) if balance else None
@@ -117,8 +117,8 @@ def debts_view(
                 [
                     progress_bar(paid_cents / total_cents, color),
                     ft.Text(
-                        f"Pagado {money(to_decimal(paid_cents))} de "
-                        f"{money(to_decimal(total_cents))}",
+                        f"Pagado {money(paid_cents)} de "
+                        f"{money(total_cents)}",
                         size=11,
                         color=TEXT_MUTED,
                     ),
@@ -148,7 +148,7 @@ def debts_view(
             b = balances.get(d.id)
             if not b:
                 continue
-            remaining = to_decimal(b.remaining_amount)
+            remaining = b.remaining_amount
             if d.direction.value == "AJENA":
                 owed_to_me += remaining
             else:
