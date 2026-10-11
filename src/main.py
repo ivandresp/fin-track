@@ -21,9 +21,12 @@ from views.people import people_view
 from views.payments import payments_view
 from views.transactions import transactions_view
 from views.welcome import welcome_view, appbar_app, get_user_name
+from views.ui import apply_theme
+from views.home import home_view
 
 
 async def main(page: ft.Page):
+    apply_theme(page)
     page.title = "FinTrack"
 
     db = DB()
