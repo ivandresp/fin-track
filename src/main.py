@@ -21,9 +21,12 @@ from views.people import people_view
 from views.payments import payments_view
 from views.transactions import transactions_view
 from views.welcome import welcome_view, appbar_app, get_user_name
+from views.ui import apply_theme
+from views.home import home_view
 
 
 async def main(page: ft.Page):
+    apply_theme(page)
     page.title = "FinTrack"
 
     db = DB()
@@ -47,40 +50,7 @@ async def main(page: ft.Page):
     status = {"user_name": await get_user_name(page)}
 
     def main_view() -> ft.View:
-        return ft.View(
-            route="/",
-            controls=[
-                appbar_app("Inicio", status["user_name"]),
-                ft.Container(
-                    padding=20,
-                    content=ft.Column(
-                        [
-                            ft.FilledButton(
-                                "Personas",
-                                icon=ft.Icons.PEOPLE,
-                                on_click=lambda e: page.navigate("/people"),
-                            ),
-                            ft.FilledButton(
-                                "Transacciones",
-                                icon=ft.Icons.SWAP_VERT,
-                                on_click=lambda e: page.navigate("/transactions"),
-                            ),
-                            ft.FilledButton(
-                                "Deudas",
-                                icon=ft.Icons.MONEY_OFF,
-                                on_click=lambda e: page.go("/debts"),
-                            ),
-                            ft.FilledButton(
-                                "Pagos",
-                                icon=ft.Icons.PAYMENTS,
-                                on_click=lambda e: page.go("/payments"),
-                            ),
-                        ],
-                        spacing=10,
-                    ),
-                ),
-            ],
-        )
+        return home_view(page, status["user_name"])
 
     async def on_continue(name:str):
         status["user_name"] = name

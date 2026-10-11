@@ -8,9 +8,11 @@ class PaymentRepository:
         self.db = db
 
     def save(self, payment:Payment, conn: sql.Connection) -> int:
-        conn = conn if conn is not None else self.db.connect()
-        cursor = conn.execute(INSERT_PAYMENT, (payment.debt_id, payment.amount, payment.method, payment.date))
-        conn.close()
+        if conn is None:
+            with self.db.connect() as c:
+                cursor = c.execute(INSERT_PAYMENT, (payment.debt_id, payment.amount, payment.method, payment.date))
+        else:
+            cursor = conn.execute(INSERT_PAYMENT, (payment.debt_id, payment.amount, payment.method, payment.date))
         return cursor.lastrowid
 
     def get_by_debt(self, debt_id: int) -> list[sql.Row]:

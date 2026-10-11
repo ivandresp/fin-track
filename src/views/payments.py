@@ -5,9 +5,31 @@ from controllers.debt.DebtController import DebtController
 from controllers.person.PersonController import PersonController
 from models.payment.Payment import Payment
 from services.utils.func import to_decimal
+from views.ui import (
+    ACCENT,
+    PillSelector,
+    dropdown,
+    empty_state,
+    grid,
+    hero_card,
+    icon_box,
+    money,
+    page_view,
+    panel,
+    primary_button,
+    section_title,
+    text_field,
+    tile,
+)
 from views.welcome import appbar_app
 
 PAYMENT_METHODS = ("EFECTIVO", "TRANSFERENCIA", "TARJETA")
+
+METHOD_LABELS = {
+    "EFECTIVO": "Efectivo",
+    "TRANSFERENCIA": "Transferencia",
+    "TARJETA": "Tarjeta",
+}
 
 METHOD_ICONS = {
     "EFECTIVO": ft.Icons.PAYMENTS,
@@ -15,135 +37,167 @@ METHOD_ICONS = {
     "TARJETA": ft.Icons.CREDIT_CARD,
 }
 
+FILTER_OPTIONS = [("ALL", "Todos")] + [
+    (m, METHOD_LABELS[m]) for m in PAYMENT_METHODS
+]
 
-def payments_view(page: ft.Page, payment_controller: PaymentController,
-    debt_controller: DebtController, person_controller: PersonController,
+
+def payments_view(
+    page: ft.Page,
+    payment_controller: PaymentController,
+    debt_controller: DebtController,
+    person_controller: PersonController,
     user_name: str,
 ) -> ft.View:
     people_by_id = {p.id: p.name for p in person_controller.on_get_all()}
- 
-    debt_dropdown = ft.Dropdown(label="Deuda a pagar", width=280)
-    method_dropdown = ft.Dropdown(
-        label="Método",
-        width=180,
-        options=[ft.dropdown.Option(m) for m in PAYMENT_METHODS],
+
+    debt_dropdown = dropdown(
+        "Deuda a pagar", options=[], col={"xs": 12, "md": 6}
+    )
+    method_dropdown = dropdown(
+        "Método",
+        options=[
+            ft.dropdown.Option(key=m, text=METHOD_LABELS[m]) for m in PAYMENT_METHODS
+        ],
         value=PAYMENT_METHODS[0],
+        col={"xs": 12, "sm": 6, "md": 3},
     )
-    txt_amount = ft.TextField(label="Monto", width=150, keyboard_type=ft.KeyboardType.NUMBER)
-    txt_date = ft.TextField(label="Fecha (opcional)", width=150, hint_text="AAAA-MM-DD")
- 
-    filter_dropdown = ft.Dropdown(
-        label="Ver por método",
-        width=200,
-        options=[ft.dropdown.Option("Todos")] + [ft.dropdown.Option(m) for m in PAYMENT_METHODS],
-        value="Todos",
+    txt_amount = text_field(
+        "Monto",
+        keyboard_type=ft.KeyboardType.NUMBER,
+        prefix="$ ",
+        col={"xs": 12, "sm": 6, "md": 3},
     )
- 
-    payment_list = ft.ListView(expand=True, spacing=8, padding=10)
- 
-    def _on_load_unsettled_debts():
-        unsettled_debts = debt_controller.on_find_by_settled(False)
-        debt_dropdown.options = [
-            ft.dropdown.Option(
-                key=str(d.id),
-                text=f"{people_by_id.get(d.involved_person_id, 'Desconocido')} — deuda #{d.id}",
+    txt_date = text_field(
+        "Fecha (opcional)", hint_text="AAAA-MM-DD", col={"xs": 12, "sm": 6, "md": 4}
+    )
+
+    hero_slot = ft.Container()
+    list_area = ft.Column(spacing=12)
+    state = {"pending_count": 0}
+
+    def _load_unsettled_debts():
+        unsettled = debt_controller.on_find_by_settled(False)
+        state["pending_count"] = len(unsettled)
+
+        options = []
+        for d in unsettled:
+            name = people_by_id.get(d.involved_person_id, "Desconocido")
+            balance = debt_controller.on_get_balance(d.id)
+            detail = (
+                f"restan {money(to_decimal(balance.remaining_amount))}"
+                if balance
+                else f"deuda #{d.id}"
             )
-            for d in unsettled_debts
-        ]
+            options.append(
+                ft.dropdown.Option(key=str(d.id), text=f"{name} ({detail})")
+            )
+        debt_dropdown.options = options
         debt_dropdown.value = None
- 
-    def _refresh_list():
-        payment_list.controls.clear()
-        if filter_dropdown.value == "Todos":
+        debt_dropdown.helper = None if options else "No tienes deudas pendientes"
+
+    def _row_payment(payment: Payment) -> ft.Container:
+        debt = debt_controller.on_find(payment.debt_id)
+        person_name = (
+            people_by_id.get(debt.involved_person_id, "Desconocido")
+            if debt
+            else "Deuda no encontrada"
+        )
+        method = payment.method.value
+        return tile(
+            title=person_name,
+            subtitle=METHOD_LABELS.get(method, method.title()),
+            leading=icon_box(METHOD_ICONS.get(method, ft.Icons.PAYMENT), ACCENT),
+            value=money(to_decimal(payment.amount)),
+            aside=str(payment.date)[:10],
+        )
+
+    def _render():
+        selected = filters.value
+        if selected == "ALL":
             payments = payment_controller.on_find_all()
         else:
-            payments = payment_controller.on_find_by_method(filter_dropdown.value)
- 
-        for payment in payments:
-            payment_list.controls.append(_row_payment(payment))
-        page.update()
- 
-    def _row_payment(payment:Payment) -> ft.Card:
-        debt = debt_controller.buscar(payment.debt_id)
-        person_name = (people_by_id.get(debt.involved_person_id, "Desconocido") if debt else "Deuda no encontrada")
-        amount = to_decimal(payment.amount)
- 
-        return ft.Card(
-            content=ft.Container(
-                padding=15,
-                content=ft.Row(
-                    [
-                        ft.Icon(METHOD_ICONS.get(payment.method.value, ft.Icons.PAYMENT)),
-                        ft.Column(
-                            [
-                                ft.Text(f"${amount}", weight=ft.FontWeight.BOLD),
-                                ft.Text(
-                                    f"{person_name} — {payment.method.value}",
-                                    size=12,
-                                    color=ft.Colors.GREY,
-                                ),
-                            ],
-                            spacing=2,
-                            expand=True,
-                        ),
-                        ft.Text(str(payment.date), size=12, color=ft.Colors.GREY),
-                    ],
-                    spacing=10,
+            payments = payment_controller.on_find_by_method(selected)
+
+        total = sum((to_decimal(p.amount) for p in payments), 0)
+        hero_slot.content = hero_card(
+            "Total pagado",
+            money(total),
+            stats=[
+                ("Pagos", str(len(payments)), ft.Icons.RECEIPT_LONG),
+                (
+                    "Deudas pendientes",
+                    str(state["pending_count"]),
+                    ft.Icons.PENDING_ACTIONS,
                 ),
-            )
+            ],
         )
- 
+
+        if payments:
+            list_area.controls = [grid([_row_payment(p) for p in payments])]
+        else:
+            list_area.controls = [
+                empty_state(
+                    ft.Icons.PAYMENTS,
+                    "Todavía no hay pagos",
+                    "Elige una deuda y registra tu primer abono.",
+                )
+            ]
+
+    def _refresh():
+        _render()
+        page.update()
+
+    filters = PillSelector(FILTER_OPTIONS, "ALL", lambda _key: _refresh())
+
     def _on_add(e):
         if not debt_dropdown.value:
-            debt_dropdown.error_text = "Selecciona una deuda"
+            debt_dropdown.error = "Selecciona una deuda"
             page.update()
             return
-        debt_dropdown.error_text = None
- 
-        resultado = debt_controller.on_save_payment(
-            int(debt_dropdown.value), txt_amount.value,
-            method_dropdown.value, txt_date.value or None,
+        debt_dropdown.error = None
+
+        result = debt_controller.on_save_payment(
+            int(debt_dropdown.value),
+            txt_amount.value,
+            method_dropdown.value,
+            txt_date.value or None,
         )
-        if resultado is not None:
+        if result is not None:
             txt_amount.value = ""
             txt_date.value = ""
-            _on_load_unsettled_debts()  # si quedó saldada, desaparece de la lista
-            _refresh_list()
+            _load_unsettled_debts()  # si quedó saldada, desaparece de la lista
+            _refresh()
         else:
             page.update()
- 
-    def _on_filter_change(e):
-        _refresh_list()
- 
-    filter_dropdown.on_change = _on_filter_change
- 
-    _on_load_unsettled_debts()
-    _refresh_list()
- 
-    return ft.View(
-        route="/payments",
-        controls=[
-            appbar_app("Pagos", user_name),
-            ft.Container(
-                expand=True,
-                padding=20,
-                content=ft.Column(
-                    [
-                        ft.Row(
-                            [debt_dropdown, method_dropdown, txt_amount, txt_date],
-                            wrap=True,
-                            spacing=10,
-                        ),
-                        ft.FilledButton(
-                            "Registrar pago", icon=ft.Icons.ADD, on_click=_on_add
-                        ),
-                        ft.Divider(),
-                        filter_dropdown,
-                        payment_list,
-                    ],
-                    spacing=15,
-                    expand=True,
+
+    _load_unsettled_debts()
+    _render()
+
+    form = panel(
+        ft.Column(
+            [
+                section_title("Nuevo pago"),
+                ft.ResponsiveRow(
+                    [debt_dropdown, method_dropdown, txt_amount],
+                    spacing=12,
+                    run_spacing=12,
                 ),
-            ),
-        ],
+                ft.ResponsiveRow([txt_date], spacing=12, run_spacing=12),
+                ft.ResponsiveRow(
+                    [primary_button("Registrar pago", _on_add, ft.Icons.ADD)]
+                ),
+            ],
+            spacing=14,
+        )
+    )
+
+    return page_view(
+        "/payments",
+        appbar_app(page, "Pagos", user_name),
+        hero_slot,
+        form,
+        section_title("Historial de pagos"),
+        filters.control,
+        list_area,
     )
