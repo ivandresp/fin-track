@@ -8,6 +8,8 @@ from services.utils.func import to_decimal
 from views.ui import (
     ACCENT,
     PillSelector,
+    amount_field,
+    clean_amount,
     dropdown,
     empty_state,
     grid,
@@ -37,9 +39,7 @@ METHOD_ICONS = {
     "TARJETA": ft.Icons.CREDIT_CARD,
 }
 
-FILTER_OPTIONS = [("ALL", "Todos")] + [
-    (m, METHOD_LABELS[m]) for m in PAYMENT_METHODS
-]
+FILTER_OPTIONS = [("ALL", "Todos")] + [(m, METHOD_LABELS[m]) for m in PAYMENT_METHODS]
 
 
 def payments_view(
@@ -51,9 +51,7 @@ def payments_view(
 ) -> ft.View:
     people_by_id = {p.id: p.name for p in person_controller.on_get_all()}
 
-    debt_dropdown = dropdown(
-        "Deuda a pagar", options=[], col={"xs": 12, "md": 6}
-    )
+    debt_dropdown = dropdown("Deuda a pagar", options=[], col={"xs": 12, "md": 6})
     method_dropdown = dropdown(
         "Método",
         options=[
@@ -62,12 +60,7 @@ def payments_view(
         value=PAYMENT_METHODS[0],
         col={"xs": 12, "sm": 6, "md": 3},
     )
-    txt_amount = text_field(
-        "Monto",
-        keyboard_type=ft.KeyboardType.NUMBER,
-        prefix="$ ",
-        col={"xs": 12, "sm": 6, "md": 3},
-    )
+    txt_amount = amount_field(col={"xs": 12, "sm": 6, "md": 3})
     txt_date = text_field(
         "Fecha (opcional)", hint_text="AAAA-MM-DD", col={"xs": 12, "sm": 6, "md": 4}
     )
@@ -89,9 +82,7 @@ def payments_view(
                 if balance
                 else f"deuda #{d.id}"
             )
-            options.append(
-                ft.dropdown.Option(key=str(d.id), text=f"{name} ({detail})")
-            )
+            options.append(ft.dropdown.Option(key=str(d.id), text=f"{name} ({detail})"))
         debt_dropdown.options = options
         debt_dropdown.value = None
         debt_dropdown.helper = None if options else "No tienes deudas pendientes"
@@ -159,7 +150,7 @@ def payments_view(
 
         result = debt_controller.on_save_payment(
             int(debt_dropdown.value),
-            txt_amount.value,
+            clean_amount(txt_amount.value),
             method_dropdown.value,
             txt_date.value or None,
         )
