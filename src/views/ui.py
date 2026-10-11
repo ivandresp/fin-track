@@ -20,12 +20,12 @@ from typing import Callable
 import flet as ft
 
 # ── Paleta ───────────────────────────────────────────────────────────────
-BG = "#120F1A"          # fondo de la app
-SURFACE = "#1C1827"     # paneles y tarjetas
-SURFACE_2 = "#272134"   # campos, chips, cajas de iconos
-PRIMARY = "#8B2FE3"     # violeta principal
+BG = "#120F1A"  # fondo de la app
+SURFACE = "#1C1827"  # paneles y tarjetas
+SURFACE_2 = "#272134"  # campos, chips, cajas de iconos
+PRIMARY = "#8B2FE3"  # violeta principal
 PRIMARY_DEEP = "#4C1D95"
-ACCENT = "#C4A1FF"      # violeta claro para iconos y foco
+ACCENT = "#C4A1FF"  # violeta claro para iconos y foco
 TEXT = "#F5F2FB"
 TEXT_MUTED = "#9D94B1"
 DANGER = "#FF5470"
@@ -101,9 +101,7 @@ def section_title(text: str) -> ft.Text:
 
 
 def panel(content: ft.Control) -> ft.Container:
-    return ft.Container(
-        content=content, padding=18, bgcolor=SURFACE, border_radius=22
-    )
+    return ft.Container(content=content, padding=18, bgcolor=SURFACE, border_radius=22)
 
 
 # ── Tarjeta protagonista ─────────────────────────────────────────────────
@@ -178,15 +176,23 @@ def text_field(label: str, **kwargs) -> ft.TextField:
         label=label,
         filled=True,
         fill_color=SURFACE_2,
-        border_radius=14,
-        border_color=ft.Colors.TRANSPARENT,
-        focused_border_color=ACCENT,
+        border={
+            ft.ControlState.DEFAULT: ft.OutlineInputBorder(
+                border_radius=14, side=ft.BorderSide(color=ft.Colors.TRANSPARENT)
+            ),
+            ft.ControlState.FOCUSED: ft.OutlineInputBorder(
+                border_radius=14,
+                side=ft.BorderSide(color=ACCENT),
+            ),
+        },
         text_size=14,
         **kwargs,
     )
 
 
-def dropdown(label: str, options: list, value: str | None = None, **kwargs) -> ft.Dropdown:
+def dropdown(
+    label: str, options: list, value: str | None = None, **kwargs
+) -> ft.Dropdown:
     kwargs.setdefault("col", FIELD_COL)
     return ft.Dropdown(
         label=label,
@@ -194,9 +200,15 @@ def dropdown(label: str, options: list, value: str | None = None, **kwargs) -> f
         value=value,
         filled=True,
         fill_color=SURFACE_2,
-        border_radius=14,
-        border_color=ft.Colors.TRANSPARENT,
-        focused_border_color=ACCENT,
+        border={
+            ft.ControlState.DEFAULT: ft.OutlineInputBorder(
+                border_radius=14, side=ft.BorderSide(color=ft.Colors.TRANSPARENT)
+            ),
+            ft.ControlState.FOCUSED: ft.OutlineInputBorder(
+                border_radius=14,
+                side=ft.BorderSide(color=ACCENT),
+            ),
+        },
         text_size=14,
         **kwargs,
     )
@@ -212,9 +224,7 @@ def primary_button(
     content: list[ft.Control] = []
     if icon:
         content.append(ft.Icon(icon, color=WHITE, size=20))
-    content.append(
-        ft.Text(text, color=WHITE, size=15, weight=ft.FontWeight.W_600)
-    )
+    content.append(ft.Text(text, color=WHITE, size=15, weight=ft.FontWeight.W_600))
     return ft.Container(
         content=ft.Row(content, alignment=ft.MainAxisAlignment.CENTER, spacing=8),
         padding=ft.Padding(left=24, top=14, right=24, bottom=14),
@@ -368,9 +378,7 @@ def tile(
                 spacing=2,
                 expand=True,
             ),
-            ft.Column(
-                right, spacing=4, horizontal_alignment=ft.CrossAxisAlignment.END
-            ),
+            ft.Column(right, spacing=4, horizontal_alignment=ft.CrossAxisAlignment.END),
         ],
         spacing=12,
         vertical_alignment=ft.CrossAxisAlignment.CENTER,

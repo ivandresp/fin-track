@@ -50,40 +50,7 @@ async def main(page: ft.Page):
     status = {"user_name": await get_user_name(page)}
 
     def main_view() -> ft.View:
-        return ft.View(
-            route="/",
-            controls=[
-                appbar_app(page, "Inicio", status["user_name"], show_back=False),
-                ft.Container(
-                    padding=20,
-                    content=ft.Column(
-                        [
-                            ft.FilledButton(
-                                "Personas",
-                                icon=ft.Icons.PEOPLE,
-                                on_click=lambda e: page.navigate("/people"),
-                            ),
-                            ft.FilledButton(
-                                "Transacciones",
-                                icon=ft.Icons.SWAP_VERT,
-                                on_click=lambda e: page.navigate("/transactions"),
-                            ),
-                            ft.FilledButton(
-                                "Deudas",
-                                icon=ft.Icons.MONEY_OFF,
-                                on_click=lambda e: page.navigate("/debts"),
-                            ),
-                            ft.FilledButton(
-                                "Pagos",
-                                icon=ft.Icons.PAYMENTS,
-                                on_click=lambda e: page.navigate("/payments"),
-                            ),
-                        ],
-                        spacing=10,
-                    ),
-                ),
-            ],
-        )
+        return home_view(page, status["user_name"])
 
     async def on_continue(name:str):
         status["user_name"] = name
