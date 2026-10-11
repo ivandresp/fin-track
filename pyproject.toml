@@ -13,9 +13,6 @@ product = "FinTrack"
 [tool.flet.android]
 adaptive_icon_background = "#ffffff"
 
-[tool.flet.icons]
-android = "assets/icon.png"
-
 [tool.flet.app]
 path = "src"
 module = "main"
