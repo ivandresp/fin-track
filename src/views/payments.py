@@ -85,7 +85,7 @@ def payments_view(
             name = people_by_id.get(d.involved_person_id, "Desconocido")
             balance = debt_controller.on_get_balance(d.id)
             detail = (
-                f"restan {money(to_decimal(balance.remaining_amount))}"
+                f"restan {money(balance.remaining_amount)}"
                 if balance
                 else f"deuda #{d.id}"
             )
