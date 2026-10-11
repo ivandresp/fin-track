@@ -1,0 +1,14 @@
+@startuml
+
+left to right direction
+
+class Person
+class Transaction
+class Debt
+class Payment
+
+Person "1"--"*" Debt
+Debt --|> Transaction
+Debt "1"--"*" Payment
+
+@enduml

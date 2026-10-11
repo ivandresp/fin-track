@@ -1,0 +1,42 @@
+@startuml
+
+left to right direction
+
+class Person{
+    +id : int
+    +name: str
+    +phone: str
+}
+
+class Transaction{
+    +id : int
+    +type: TransactionType
+    +amount : Money
+    +description : str
+    +date : date
+    +created_at : datetime 
+}
+
+class Debt{
+    +id : int
+    +transaction_id : int
+    +involved_person_id : int
+    +direction: DebtDirection
+    +max_term: date
+    +settled : bool
+    +settled_at : datetime
+}
+
+class Payment{
+    +id : int
+    +debt_id : int
+    +amount : Money
+    +date : date
+    +created_at : datetime
+}
+
+Person "1"--o"*" Debt
+Debt --|> Transaction
+Debt "1"*--"*" Payment
+
+@enduml

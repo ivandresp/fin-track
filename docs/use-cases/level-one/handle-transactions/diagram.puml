@@ -1,0 +1,30 @@
+@startuml
+
+left to right direction
+
+actor User as U
+
+package "Handle Transactions" {
+    usecase "Register Transaction" as UC1
+    usecase "List Transactions" as UC2
+    usecase "Search Transaction" as UC3
+    usecase "Update Transaction" as UC4
+    usecase "Filter by Type" as UC5
+    usecase "Filter by Date" as UC6
+    usecase "Filter by Amount" as UC7
+    usecase "Validate Transaction Do Exists" as UC8
+}
+
+U -- UC1
+U -- UC2
+U -- UC3
+U -- UC4
+
+UC3 ..> UC8 : <<include>>
+UC4 ..> UC8 : <<include>>
+
+UC2 <.. UC5 : <<extends>>
+UC2 <.. UC6 : <<extends>>
+UC2 <.. UC7 : <<extends>>
+
+@enduml
