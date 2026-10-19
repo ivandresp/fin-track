@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     type TEXT NOT NULL CHECK (type IN ('INGRESO', 'GASTO', 'DEUDA')),
     amount INTEGER NOT NULL CHECK (amount > 0),
     description TEXT,
-    date TEXT NOT NULL DEFAULT (date('now')),
+    date TEXT NOT NULL DEFAULT (date('now', 'localtime')),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -29,18 +29,28 @@ CREATE TABLE IF NOT EXISTS debts (
     FOREIGN KEY (involved_person_id) REFERENCES persons(id)
 );
 
+CREATE TABLE IF NOT EXISTS debt_increases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    debt_id INTEGER NOT NULL,
+    amount INTEGER NOT NULL CHECK (amount > 0),
+    description TEXT,
+    increased_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE RESTRICT
+);
+
 CREATE TABLE IF NOT EXISTS payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     debt_id INTEGER NOT NULL,
     amount INTEGER NOT NULL CHECK (amount > 0),
     method TEXT NOT NULL CHECK (method IN ('EFECTIVO', 'TRANSFERENCIA', 'TARJETA')),
-    date TEXT NOT NULL DEFAULT (date('now')),
+    date TEXT NOT NULL DEFAULT (date('now', 'localtime')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE RESTRICT
 );
 
 CREATE INDEX IF NOT EXISTS idx_debts_person ON debts(involved_person_id);
 CREATE INDEX IF NOT EXISTS idx_payments_debt ON payments(debt_id);
+CREATE INDEX IF NOT EXISTS idx_debt_increases_debt ON debt_increases(debt_id);
 
 CREATE TRIGGER IF NOT EXISTS trg_transactions_no_delete
 BEFORE DELETE ON transactions
@@ -49,6 +59,10 @@ BEGIN SELECT RAISE(ABORT, 'No se permite eliminar transacciones'); END;
 CREATE TRIGGER IF NOT EXISTS trg_debts_no_delete
 BEFORE DELETE ON debts
 BEGIN SELECT RAISE(ABORT, 'No se permite eliminar deudas'); END;
+
+CREATE TRIGGER IF NOT EXISTS trg_debt_increases_no_delete
+BEFORE DELETE ON debt_increases
+BEGIN SELECT RAISE(ABORT, 'No se permite eliminar aumentos de deuda'); END;
 
 CREATE TRIGGER IF NOT EXISTS trg_payments_no_delete
 BEFORE DELETE ON payments

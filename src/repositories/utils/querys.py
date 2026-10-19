@@ -1,7 +1,7 @@
 SELECT_ALL_PEOPLE = "SELECT * FROM persons ORDER BY name"
 INSERT_PERSON = "INSERT INTO persons (name, phone) VALUES (?, ?)"
 
-INSERT_TRANSACTION = "INSERT INTO transactions (type, amount, description) VALUES (?, ?, ?)"
+INSERT_TRANSACTION = "INSERT INTO transactions (type, amount, description, date) VALUES (?, ?, ?, ?)"
 SELECT_ALL_TRANSACTIONS = "SELECT * FROM transactions ORDER BY date DESC"
 SELECT_TRANSACTION_BY_TYPE = "SELECT * FROM transactions WHERE type = ? ORDER BY date DESC"
 SELECT_ONE_TRANSACTION = "SELECT * FROM transactions WHERE id = ?"
@@ -23,6 +23,22 @@ SELECT_DEBT_TOTAL = """
 """
 
 SETTLE_DEBT = "UPDATE debts SET settled = 1, settled_at = datetime('now') WHERE id = ?"
+
+INCREASE_DEBT_AMOUNT = """
+    UPDATE transactions
+    SET amount = amount + ?
+    WHERE type = 'DEUDA'
+      AND id = (
+          SELECT transaction_id
+          FROM debts
+          WHERE id = ? AND settled = 0
+      )
+"""
+
+INSERT_DEBT_INCREASE = "INSERT INTO debt_increases (debt_id, amount, description) VALUES (?, ?, ?)"
+SELECT_DEBT_INCREASES_BY_DEBT = "SELECT * FROM debt_increases WHERE debt_id = ? ORDER BY increased_at DESC, id DESC"
+SELECT_ALL_DEBT_INCREASES = "SELECT * FROM debt_increases ORDER BY increased_at DESC, id DESC"
+SELECT_ONE_DEBT_INCREASE = "SELECT * FROM debt_increases WHERE id = ?"
 
 INSERT_PAYMENT = "INSERT INTO payments (debt_id, amount, method, date) VALUES (?, ?, ?, ?)"
 SELECT_ALL_PAYMENTS = "SELECT * FROM payments ORDER BY date DESC"

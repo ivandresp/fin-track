@@ -7,19 +7,30 @@ from repositories.utils.querys import (
     SELECT_DEBT_TOTAL,
     SETTLE_DEBT,
     SELECT_ONE_DEBT,
-    SELECT_DEBTS_BY_DIRECTION
+    SELECT_DEBTS_BY_DIRECTION,
+    INCREASE_DEBT_AMOUNT,
 )
 from models.debt.Debt import Debt
 from models.debt.DebtDirection import DebtDirection
+from models.debt.DebtIncrease import DebtIncrease
 from models.payment.Payment import Payment
 from repositories.utils.DB import DB
+from repositories.debt.DebtIncreaseRepository import DebtIncreaseRepository
 from repositories.payment.PaymentRepository import PaymentRepository
 
 
 class DebtRepository:
-    def __init__(self, db: DB, payment_repository: PaymentRepository | None = None):
+    def __init__(
+        self,
+        db: DB,
+        payment_repository: PaymentRepository | None = None,
+        debt_increase_repository: DebtIncreaseRepository | None = None,
+    ):
         self.db = db
         self.payment_repository = payment_repository
+        self.debt_increase_repository = (
+            debt_increase_repository or DebtIncreaseRepository(db)
+        )
 
     def save(self, debt: Debt) -> int:
         with self.db.connect() as conn:
@@ -33,6 +44,35 @@ class DebtRepository:
                 ),
             )
             return cursor.lastrowid
+
+    def increase_amount(self, increase: DebtIncrease) -> sql.Row:
+        """Aplica un aumento y guarda su historial en una sola transacción.
+
+        Retorna la fila con los totales actualizados. La condición ``settled = 0``
+        vive dentro del UPDATE para que la validación sea atómica.
+        """
+        conn = self.db.connect()
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+
+            cursor = conn.execute(
+                INCREASE_DEBT_AMOUNT, (increase.amount, increase.debt_id)
+            )
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    f"No existe la deuda {increase.debt_id} o ya está saldada."
+                )
+
+            self.debt_increase_repository.save(increase, conn=conn)
+            row = self.get_debt_total(increase.debt_id, conn)
+
+            conn.commit()
+            return row
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
 
     def get_all(self) -> list[sql.Row]:
         with self.db.connect() as conn:

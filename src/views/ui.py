@@ -194,6 +194,7 @@ def hero_card(
 
     return ft.Container(
         content=ft.Column(items, spacing=4),
+        align=ft.Alignment.CENTER_RIGHT,
         padding=22,
         border_radius=28,
         gradient=gradient(),
@@ -252,6 +253,9 @@ def dropdown(
     label: str, options: list, value: str | None = None, **kwargs
 ) -> ft.Dropdown:
     kwargs.setdefault("col", FIELD_COL)
+    # El Dropdown de Flet no se estira solo dentro de un ResponsiveRow:
+    # sin esto toma el ancho de su contenido y la etiqueta puede cortarse.
+    kwargs.setdefault("width", float("inf"))
     return ft.Dropdown(
         label=label,
         options=options,

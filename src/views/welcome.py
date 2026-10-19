@@ -99,7 +99,11 @@ def welcome_view(page: ft.Page, on_continue) -> ft.View:
 
 
 def appbar_app(
-    page: ft.Page, title: str, user_name: str, show_back: bool = True
+    page: ft.Page,
+    title: str,
+    user_name: str,
+    show_back: bool = True,
+    back_route: str = "/",
 ) -> ft.AppBar:
     short_name = user_name if len(user_name) <= 14 else user_name[:13] + "…"
 
@@ -122,8 +126,8 @@ def appbar_app(
             ft.IconButton(
                 icon=ft.Icons.ARROW_BACK,
                 icon_color=TEXT,
-                tooltip="Volver al inicio",
-                on_click=lambda e: page.navigate("/"),
+                tooltip="Volver",
+                on_click=lambda e: page.navigate(back_route),
             )
             if show_back
             else None

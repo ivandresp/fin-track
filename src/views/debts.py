@@ -103,6 +103,15 @@ def debts_view(
         else:
             status = badge("Pendiente", WARNING)
 
+        aside = ft.Row(
+            [
+                status,
+                ft.Icon(ft.Icons.CHEVRON_RIGHT, size=18, color=TEXT_MUTED),
+            ],
+            spacing=4,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        )
+
         remaining = balance.remaining_amount if balance else None
 
         footer = None
@@ -121,7 +130,7 @@ def debts_view(
                 spacing=6,
             )
 
-        return tile(
+        card = tile(
             title=person_name,
             subtitle=subtitle,
             leading=icon_box(
@@ -129,9 +138,12 @@ def debts_view(
             ),
             value=money(remaining) if remaining is not None else "Sin saldo",
             value_color=TEXT_MUTED if debt.settled else color,
-            aside=status,
+            aside=aside,
             footer=footer,
         )
+        card.ink = True
+        card.on_click = lambda e, d=debt: page.navigate(f"/debts/{d.id}")
+        return card
 
     def _render():
         pending = controller.on_find_by_settled(False)
