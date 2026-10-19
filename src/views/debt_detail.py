@@ -6,6 +6,7 @@ from controllers.debt.DebtController import DebtController
 from controllers.person.PersonController import PersonController
 from models.debt.Debt import Debt
 from models.debt.DebtIncrease import DebtIncrease
+from services.utils.dates import format_local_datetime
 from services.utils.func import to_decimal
 from views.ui import (
     DANGER,
@@ -46,14 +47,6 @@ def _status_badge(debt: Debt) -> ft.Container:
     if _is_overdue(debt):
         return badge("Vencida", DANGER)
     return badge("Pendiente", WARNING)
-
-
-def _format_increased_at(increased_at) -> str:
-    if not increased_at:
-        return "Sin fecha"
-    if isinstance(increased_at, str):
-        return increased_at[:16].replace("T", " ")
-    return increased_at.strftime("%Y-%m-%d %H:%M")
 
 
 def _info_item(label: str, value: str | ft.Control) -> ft.Container:
@@ -150,7 +143,7 @@ def debt_detail_view(
             [
                 tile(
                     title=increase.description or "Aumento de deuda",
-                    subtitle=f"#{increase.id} · {_format_increased_at(increase.increased_at)}",
+                    subtitle=format_local_datetime(increase.increased_at),
                     leading=icon_box(ft.Icons.TRENDING_UP, WARNING),
                     value=f"+{money(to_decimal(increase.amount))}",
                     value_color=WARNING,

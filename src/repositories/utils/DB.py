@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     type TEXT NOT NULL CHECK (type IN ('INGRESO', 'GASTO', 'DEUDA')),
     amount INTEGER NOT NULL CHECK (amount > 0),
     description TEXT,
-    date TEXT NOT NULL DEFAULT (date('now')),
+    date TEXT NOT NULL DEFAULT (date('now', 'localtime')),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS payments (
     debt_id INTEGER NOT NULL,
     amount INTEGER NOT NULL CHECK (amount > 0),
     method TEXT NOT NULL CHECK (method IN ('EFECTIVO', 'TRANSFERENCIA', 'TARJETA')),
-    date TEXT NOT NULL DEFAULT (date('now')),
+    date TEXT NOT NULL DEFAULT (date('now', 'localtime')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE RESTRICT
 );

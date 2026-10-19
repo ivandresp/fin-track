@@ -4,6 +4,7 @@ from models.debt.Debt import Debt, DebtDirection, Date
 from models.debt.DebtIncrease import DebtIncrease
 from models.payment.Payment import Payment, PaymentMethod
 from services.utils.Balance import Balance, Decimal
+from services.utils.dates import local_today_iso
 from services.utils.func import to_cents
 
 DIRECTIONS = ("PROPIA", "AJENA")
@@ -94,7 +95,7 @@ class DebtService:
             raise ValueError("Metodo de pago invalido")
 
         payment = Payment(debt_id=debt_id, amount=to_cents(amount), method=PaymentMethod(method), 
-                    date=date or Date.today().isoformat())
+                    date=date or local_today_iso())
         
         return self.repo.register_payment_and_validate(payment)
 

@@ -1,7 +1,7 @@
 SELECT_ALL_PEOPLE = "SELECT * FROM persons ORDER BY name"
 INSERT_PERSON = "INSERT INTO persons (name, phone) VALUES (?, ?)"
 
-INSERT_TRANSACTION = "INSERT INTO transactions (type, amount, description) VALUES (?, ?, ?)"
+INSERT_TRANSACTION = "INSERT INTO transactions (type, amount, description, date) VALUES (?, ?, ?, ?)"
 SELECT_ALL_TRANSACTIONS = "SELECT * FROM transactions ORDER BY date DESC"
 SELECT_TRANSACTION_BY_TYPE = "SELECT * FROM transactions WHERE type = ? ORDER BY date DESC"
 SELECT_ONE_TRANSACTION = "SELECT * FROM transactions WHERE id = ?"
