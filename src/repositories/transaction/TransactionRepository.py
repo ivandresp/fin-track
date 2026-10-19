@@ -7,6 +7,7 @@ from repositories.utils.querys import (
 )
 from models.transaction.Transaction import Transaction
 from repositories.utils.DB import DB
+from services.utils.dates import local_today_iso
 
 
 class TransactionRepository:
@@ -14,10 +15,20 @@ class TransactionRepository:
         self.db = db
 
     def save(self, transaction: Transaction) -> int:
+        transaction_date = (
+            transaction.date.isoformat()
+            if transaction.date
+            else local_today_iso()
+        )
         with self.db.connect() as conn:
             cursor = conn.execute(
                 INSERT_TRANSACTION,
-                (transaction.type, transaction.amount, transaction.description),
+                (
+                    transaction.type,
+                    transaction.amount,
+                    transaction.description,
+                    transaction_date,
+                ),
             )
             return cursor.lastrowid
 
