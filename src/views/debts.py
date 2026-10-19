@@ -87,54 +87,6 @@ def debts_view(
     hero_slot = ft.Container()
     list_area = ft.Column(spacing=12)
 
-    def _open_increase_dialog(debt: Debt, balance):
-        person_name = people_by_id.get(debt.involved_person_id, "Desconocido")
-        current_remaining = balance.remaining_amount if balance else None
-        txt_increase = amount_field("Monto a aumentar", autofocus=True)
-
-        def _close(_e=None):
-            page.pop_dialog()
-
-        def _confirm(_e=None):
-            updated = controller.on_increase_amount(
-                debt.id, clean_amount(txt_increase.value)
-            )
-            if updated is None:
-                return
-            dialog.open = False
-            dialog.update()
-            _refresh()
-
-        dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Aumentar deuda"),
-            content=ft.Column(
-                [
-                    ft.Text(
-                        f"{person_name} · "
-                        f"{'Yo debo' if debt.direction.value == 'PROPIA' else 'Me deben'}",
-                        size=13,
-                        color=TEXT_MUTED,
-                    ),
-                    ft.Text(
-                        f"Saldo actual: {money(current_remaining)}"
-                        if current_remaining is not None
-                        else "Saldo no disponible",
-                        size=13,
-                        color=TEXT_MUTED,
-                    ),
-                    txt_increase,
-                ],
-                tight=True,
-                spacing=12,
-            ),
-            actions=[
-                ft.TextButton("Cancelar", on_click=_close),
-                ft.FilledButton("Aumentar", on_click=_confirm),
-            ],
-        )
-        page.show_dialog(dialog)
-
     def _row_debt(debt: Debt, balance) -> ft.Container:
         person_name = people_by_id.get(debt.involved_person_id, "Desconocido")
         i_owe = debt.direction.value == "PROPIA"
@@ -151,24 +103,14 @@ def debts_view(
         else:
             status = badge("Pendiente", WARNING)
 
-        aside = status
-        if not debt.settled:
-            aside = ft.Row(
-                [
-                    status,
-                    ft.IconButton(
-                        icon=ft.Icons.ADD_CIRCLE_OUTLINE,
-                        icon_color=color,
-                        icon_size=20,
-                        tooltip="Aumentar monto",
-                        on_click=lambda e, d=debt, b=balance: _open_increase_dialog(
-                            d, b
-                        ),
-                    ),
-                ],
-                spacing=2,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            )
+        aside = ft.Row(
+            [
+                status,
+                ft.Icon(ft.Icons.CHEVRON_RIGHT, size=18, color=TEXT_MUTED),
+            ],
+            spacing=4,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        )
 
         remaining = balance.remaining_amount if balance else None
 
@@ -188,7 +130,7 @@ def debts_view(
                 spacing=6,
             )
 
-        return tile(
+        card = tile(
             title=person_name,
             subtitle=subtitle,
             leading=icon_box(
@@ -199,6 +141,9 @@ def debts_view(
             aside=aside,
             footer=footer,
         )
+        card.ink = True
+        card.on_click = lambda e, d=debt: page.navigate(f"/debts/{d.id}")
+        return card
 
     def _render():
         pending = controller.on_find_by_settled(False)

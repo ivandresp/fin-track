@@ -2,6 +2,7 @@ import flet as ft
 
 from repositories.utils.DB import DB
 from repositories.debt.DebtRepository import DebtRepository
+from repositories.debt.DebtIncreaseRepository import DebtIncreaseRepository
 from repositories.person.PersonRepository import PersonRepository
 from repositories.payment.PaymentRepository import PaymentRepository
 from repositories.transaction.TransactionRepository import TransactionRepository
@@ -17,6 +18,7 @@ from controllers.payment.PaymentController import PaymentController
 from controllers.transaction.TransactionController import TransactionController
 
 from views.debts import debts_view
+from views.debt_detail import debt_detail_view
 from views.people import people_view
 from views.payments import payments_view
 from views.transactions import transactions_view
@@ -43,8 +45,9 @@ async def main(page: ft.Page):
     payment_service = PaymentService(payment_repo)
     payment_controller = PaymentController(payment_service, page)
 
-    debt_repo = DebtRepository(db, payment_repo)
-    debt_service = DebtService(debt_repo)
+    debt_increase_repo = DebtIncreaseRepository(db)
+    debt_repo = DebtRepository(db, payment_repo, debt_increase_repo)
+    debt_service = DebtService(debt_repo, debt_increase_repo)
     debt_controller = DebtController(debt_service, transaction_service, page)
 
     status = {"user_name": await get_user_name(page)}
@@ -71,6 +74,22 @@ async def main(page: ft.Page):
         elif page.route == "/debts":
             page.views.append(debts_view(page, debt_controller, person_controller, status["user_name"]))
         
+        elif page.route.startswith("/debts/"):
+            try:
+                debt_id = int(page.route.rstrip("/").rsplit("/", 1)[-1])
+            except ValueError:
+                page.views.append(main_view())
+            else:
+                page.views.append(
+                    debt_detail_view(
+                        page,
+                        debt_controller,
+                        person_controller,
+                        status["user_name"],
+                        debt_id,
+                    )
+                )
+
         elif page.route == "/payments":
             page.views.append(payments_view(page,payment_controller,debt_controller,person_controller,status["user_name"],))
         

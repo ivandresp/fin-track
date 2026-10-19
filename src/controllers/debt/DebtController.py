@@ -1,4 +1,5 @@
 import flet as ft
+from models.debt.DebtIncrease import DebtIncrease
 from services.debt.DebtService import DebtService
 from services.transaction.TransactionService import TransactionService
 from controllers.utils.convert import decimal_from_str
@@ -53,10 +54,12 @@ class DebtController:
             self._show_msg(msg, is_error=True)
             return None
 
-    def on_increase_amount(self, debt_id: int, amount_txt: str):
+    def on_increase_amount(
+        self, debt_id: int, amount_txt: str, description: str | None = None
+    ):
         try:
             amount = decimal_from_str(amount_txt)
-            balance = self.service.increase_amount(debt_id, amount)
+            balance = self.service.increase_amount(debt_id, amount, description)
             self._show_msg("Monto de la deuda actualizado")
             return balance
         except ArithmeticError:
@@ -65,6 +68,18 @@ class DebtController:
         except ValueError as e:
             self._show_msg(str(e), is_error=True)
             return None
+
+    def on_find_increases(self, debt_id: int) -> list[DebtIncrease]:
+        try:
+            return self.service.find_increases(debt_id)
+        except ValueError as e:
+            self._show_msg(str(e), is_error=True)
+            return []
+        except Exception:
+            self._show_msg(
+                "No se pudo cargar el historial de aumentos.", is_error=True
+            )
+            return []
 
     def on_find(self, debt_id: int):
         try:

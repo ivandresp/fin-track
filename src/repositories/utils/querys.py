@@ -35,6 +35,11 @@ INCREASE_DEBT_AMOUNT = """
       )
 """
 
+INSERT_DEBT_INCREASE = "INSERT INTO debt_increases (debt_id, amount, description) VALUES (?, ?, ?)"
+SELECT_DEBT_INCREASES_BY_DEBT = "SELECT * FROM debt_increases WHERE debt_id = ? ORDER BY increased_at DESC, id DESC"
+SELECT_ALL_DEBT_INCREASES = "SELECT * FROM debt_increases ORDER BY increased_at DESC, id DESC"
+SELECT_ONE_DEBT_INCREASE = "SELECT * FROM debt_increases WHERE id = ?"
+
 INSERT_PAYMENT = "INSERT INTO payments (debt_id, amount, method, date) VALUES (?, ?, ?, ?)"
 SELECT_ALL_PAYMENTS = "SELECT * FROM payments ORDER BY date DESC"
 SELECT_PAYMENTS_BY_DEBT = "SELECT * FROM payments WHERE debt_id = ? ORDER BY date DESC"
