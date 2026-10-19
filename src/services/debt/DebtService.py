@@ -30,6 +30,22 @@ class DebtService:
 
         return self.repo.save(debt)
 
+    def increase_amount(self, debt_id: int, amount: Decimal) -> Balance:
+        """Aumenta el capital de una deuda pendiente y retorna su nuevo saldo."""
+        amount_cents = to_cents(amount)
+        if amount_cents <= 0:
+            raise ValueError("El monto del aumento debe ser mayor a cero.")
+
+        debt = self.repo.get(debt_id)
+        if debt is None:
+            raise ValueError(f"No existe la deuda {debt_id}.")
+
+        if bool(debt["settled"]):
+            raise ValueError("No se puede aumentar una deuda que ya está saldada.")
+
+        row = self.repo.increase_amount(debt_id, amount_cents)
+        return Balance.from_row(row)
+
     def find(self, debt_id:int) -> Debt:
         return Debt.from_row(self.repo.get(debt_id))
 

@@ -7,7 +7,8 @@ from repositories.utils.querys import (
     SELECT_DEBT_TOTAL,
     SETTLE_DEBT,
     SELECT_ONE_DEBT,
-    SELECT_DEBTS_BY_DIRECTION
+    SELECT_DEBTS_BY_DIRECTION,
+    INCREASE_DEBT_AMOUNT,
 )
 from models.debt.Debt import Debt
 from models.debt.DebtDirection import DebtDirection
@@ -33,6 +34,21 @@ class DebtRepository:
                 ),
             )
             return cursor.lastrowid
+
+    def increase_amount(self, debt_id: int, amount: int) -> sql.Row:
+        """Suma ``amount`` (en centavos) al capital de una deuda no saldada.
+
+        Retorna la fila con los totales actualizados. La condición ``settled = 0``
+        vive dentro del UPDATE para que la validación sea atómica.
+        """
+        with self.db.connect() as conn:
+            cursor = conn.execute(INCREASE_DEBT_AMOUNT, (amount, debt_id))
+            if cursor.rowcount == 0:
+                raise ValueError(
+                    f"No existe la deuda {debt_id} o ya está saldada."
+                )
+
+            return self.get_debt_total(debt_id, conn)
 
     def get_all(self) -> list[sql.Row]:
         with self.db.connect() as conn:

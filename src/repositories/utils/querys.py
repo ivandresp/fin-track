@@ -24,6 +24,17 @@ SELECT_DEBT_TOTAL = """
 
 SETTLE_DEBT = "UPDATE debts SET settled = 1, settled_at = datetime('now') WHERE id = ?"
 
+INCREASE_DEBT_AMOUNT = """
+    UPDATE transactions
+    SET amount = amount + ?
+    WHERE type = 'DEUDA'
+      AND id = (
+          SELECT transaction_id
+          FROM debts
+          WHERE id = ? AND settled = 0
+      )
+"""
+
 INSERT_PAYMENT = "INSERT INTO payments (debt_id, amount, method, date) VALUES (?, ?, ?, ?)"
 SELECT_ALL_PAYMENTS = "SELECT * FROM payments ORDER BY date DESC"
 SELECT_PAYMENTS_BY_DEBT = "SELECT * FROM payments WHERE debt_id = ? ORDER BY date DESC"

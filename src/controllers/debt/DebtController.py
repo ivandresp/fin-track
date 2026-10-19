@@ -53,6 +53,19 @@ class DebtController:
             self._show_msg(msg, is_error=True)
             return None
 
+    def on_increase_amount(self, debt_id: int, amount_txt: str):
+        try:
+            amount = decimal_from_str(amount_txt)
+            balance = self.service.increase_amount(debt_id, amount)
+            self._show_msg("Monto de la deuda actualizado")
+            return balance
+        except ArithmeticError:
+            self._show_msg("El monto es inválido.", is_error=True)
+            return None
+        except ValueError as e:
+            self._show_msg(str(e), is_error=True)
+            return None
+
     def on_find(self, debt_id: int):
         try:
             return self.service.find(debt_id)

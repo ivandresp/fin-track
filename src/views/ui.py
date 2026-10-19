@@ -194,6 +194,7 @@ def hero_card(
 
     return ft.Container(
         content=ft.Column(items, spacing=4),
+        align=ft.Alignment.CENTER_RIGHT,
         padding=22,
         border_radius=28,
         gradient=gradient(),
