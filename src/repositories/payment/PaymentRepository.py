@@ -1,7 +1,7 @@
 import sqlite3 as sql
 from models.payment.Payment import Payment, PaymentMethod
 from repositories.utils.DB import DB
-from repositories.utils.querys import INSERT_PAYMENT, SELECT_PAYMENTS_BY_DEBT, SELECT_PAYMENTS_BY_METHOD, SELECT_ALL_PAYMENTS, SELECT_ONE_PAYMENT
+from repositories.utils.querys import INSERT_PAYMENT, SELECT_PAYMENTS_BY_DEBT, SELECT_PAYMENTS_BY_METHOD, SELECT_ALL_PAYMENTS, SELECT_ONE_PAYMENT, SELECT_PAYMENT_TOTALS_BY_DIRECTION
 from services.utils.dates import local_today_iso
 
 class PaymentRepository:
@@ -33,5 +33,9 @@ class PaymentRepository:
     def get(self, payment_id:int) -> sql.Row:
         with self.db.connect() as conn:
             return conn.execute(SELECT_ONE_PAYMENT, (payment_id,)).fetchone()
+
+    def get_totals_by_direction(self) -> list[sql.Row]:
+        with self.db.connect() as conn:
+            return conn.execute(SELECT_PAYMENT_TOTALS_BY_DIRECTION).fetchall()
 
     

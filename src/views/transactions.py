@@ -1,6 +1,7 @@
 import flet as ft
 
 from controllers.transaction.TransactionController import TransactionController
+from controllers.payment.PaymentController import PaymentController
 from services.utils.func import to_decimal
 from models.transaction.Transaction import Transaction
 from views.ui import (
@@ -44,7 +45,10 @@ FILTER_OPTIONS = [
 
 
 def transactions_view(
-    page: ft.Page, controller: TransactionController, user_name: str
+    page: ft.Page,
+    controller: TransactionController,
+    payment_controller: PaymentController,
+    user_name: str,
 ) -> ft.View:
     dropdown_type = dropdown(
         "Tipo",
@@ -78,6 +82,7 @@ def transactions_view(
 
     def _render():
         everything = controller.on_find_all()
+        payment_totals = payment_controller.on_find_totals_by_direction() or {}
 
         income = sum(
             (to_decimal(t.amount) for t in everything if t.type.value == "INGRESO"), 0
@@ -85,6 +90,12 @@ def transactions_view(
         expenses = sum(
             (to_decimal(t.amount) for t in everything if t.type.value == "GASTO"), 0
         )
+
+        # Los pagos se computan virtualmente, sin duplicarlos en transactions.
+        # PROPIA (yo debo) -> gasto; AJENA (me deben) -> ingreso.
+        income += payment_totals.get("AJENA", 0)
+        expenses += payment_totals.get("PROPIA", 0)
+
         hero_slot.content = hero_card(
             "Balance total",
             money(income - expenses),

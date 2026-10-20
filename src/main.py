@@ -69,7 +69,7 @@ async def main(page: ft.Page):
             page.views.append(people_view(page, person_controller, status["user_name"]))
         
         elif page.route == "/transactions":
-            page.views.append(transactions_view(page, transaction_controller, status["user_name"]))
+            page.views.append(transactions_view(page, transaction_controller, payment_controller, status["user_name"]))
         
         elif page.route == "/debts":
             page.views.append(debts_view(page, debt_controller, person_controller, status["user_name"]))
