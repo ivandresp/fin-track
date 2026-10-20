@@ -9,7 +9,12 @@ class PaymentRepository:
         self.db = db
 
     def save(self, payment:Payment, conn: sql.Connection | None = None) -> int:
-        payment_date = payment.date or local_today_iso()
+        payment_date = payment.date
+        if payment_date is None:
+            payment_date = local_today_iso()
+        elif not isinstance(payment_date, str):
+            payment_date = payment_date.isoformat()[:10]
+
         params = (payment.debt_id, payment.amount, payment.method, payment_date)
         if conn is None:
             with self.db.connect() as c:

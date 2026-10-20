@@ -33,6 +33,11 @@ class DebtRepository:
         )
 
     def save(self, debt: Debt) -> int:
+        max_repayment_date = (
+            debt.max_repayment_date.isoformat()
+            if debt.max_repayment_date
+            else None
+        )
         with self.db.connect() as conn:
             cursor = conn.execute(
                 INSERT_DEBT,
@@ -40,7 +45,7 @@ class DebtRepository:
                     debt.transaction_id,
                     debt.involved_person_id,
                     debt.direction,
-                    debt.max_repayment_date,
+                    max_repayment_date,
                 ),
             )
             return cursor.lastrowid
