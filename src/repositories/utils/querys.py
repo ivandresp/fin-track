@@ -45,3 +45,9 @@ SELECT_ALL_PAYMENTS = "SELECT * FROM payments ORDER BY date DESC"
 SELECT_PAYMENTS_BY_DEBT = "SELECT * FROM payments WHERE debt_id = ? ORDER BY date DESC"
 SELECT_PAYMENTS_BY_METHOD = "SELECT * FROM payments WHERE method = ? ORDER BY date DESC"
 SELECT_ONE_PAYMENT = "SELECT * FROM payments WHERE id = ?"
+SELECT_PAYMENT_TOTALS_BY_DIRECTION = """
+    SELECT d.direction, COALESCE(SUM(p.amount), 0) AS total
+    FROM payments p
+    JOIN debts d ON d.id = p.debt_id
+    GROUP BY d.direction
+"""

@@ -249,13 +249,27 @@ def amount_field(label: str = "Monto", **kwargs) -> ft.TextField:
     )
 
 
+def _sync_dropdown_menu_width(e) -> None:
+    """Ajusta el menú al ancho real del dropdown tras cada layout."""
+    width = round(e.width, 2)
+    current = e.control.menu_width
+    if width > 0 and width != float("inf") and current != width:
+        e.control.menu_width = width
+        e.control.update()
+
+
 def dropdown(
     label: str, options: list, value: str | None = None, **kwargs
 ) -> ft.Dropdown:
     kwargs.setdefault("col", FIELD_COL)
-    # El Dropdown de Flet no se estira solo dentro de un ResponsiveRow:
-    # sin esto toma el ancho de su contenido y la etiqueta puede cortarse.
-    kwargs.setdefault("width", float("inf"))
+    # El Dropdown de Flet no se estira solo dentro de un ResponsiveRow.
+    # expand=True hace que el campo ocupe el ancho de su celda.
+    kwargs.setdefault("expand", True)
+    # Evita que Flet fije el ancho del menú a infinito por su elevation por defecto.
+    kwargs.setdefault("elevation", None)
+    # El menú se limita al ancho real del dropdown, no al de la pantalla.
+    if "menu_width" not in kwargs:
+        kwargs.setdefault("on_size_change", _sync_dropdown_menu_width)
     return ft.Dropdown(
         label=label,
         options=options,

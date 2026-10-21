@@ -38,6 +38,13 @@ class PaymentController:
             self._show_msg("No se pudo cargar los pagos de esta deuda", is_error=True)
             return []
 
+    def on_find_totals_by_direction(self):
+        try:
+            return self.service.find_totals_by_direction()
+        except Exception:
+            self._show_msg("No se pudo calcular el total de pagos", is_error=True)
+            return {}
+
     def _show_msg(self, text: str, is_error: bool = False):
         self.page.show_dialog(
             ft.SnackBar(
