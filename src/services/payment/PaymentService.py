@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from repositories.payment.PaymentRepository import PaymentRepository
 from models.payment.Payment import Payment, PaymentMethod
+from services.utils.func import to_decimal
 
 PAYMENT_METHODS = ("EFECTIVO", "TRANSFERENCIA", "TARJETA")
 
@@ -21,3 +24,9 @@ class PaymentService:
 
     def find_by_debt(self, debt_id:int):
         return [Payment.from_row(p) for p in self.repo.get_by_debt(debt_id)]
+
+    def find_totals_by_direction(self) -> dict[str, Decimal]:
+        totals = {"PROPIA": Decimal("0.00"), "AJENA": Decimal("0.00")}
+        for row in self.repo.get_totals_by_direction():
+            totals[row["direction"]] = to_decimal(row["total"])
+        return totals

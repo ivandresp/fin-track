@@ -15,11 +15,12 @@ class TransactionRepository:
         self.db = db
 
     def save(self, transaction: Transaction) -> int:
-        transaction_date = (
-            transaction.date.isoformat()
-            if transaction.date
-            else local_today_iso()
-        )
+        transaction_date = transaction.date
+        if transaction_date is None:
+            transaction_date = local_today_iso()
+        elif not isinstance(transaction_date, str):
+            transaction_date = transaction_date.isoformat()[:10]
+
         with self.db.connect() as conn:
             cursor = conn.execute(
                 INSERT_TRANSACTION,
